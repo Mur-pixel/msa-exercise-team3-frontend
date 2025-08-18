@@ -1,0 +1,35 @@
+/* === 회원탈퇴 보조 스타일 (Profile/EditProfile 기반 보정) === */
+
+/* 카드 내부 섹션 타이틀 */
+.da-section-title {
+    font-weight: 500;
+    padding: 14px 16px 8px;
+    color: #111;
+}
+
+/* 입력 한 줄만 필요해서 간단한 래퍼 */
+.da-input-row {
+    padding: 0 16px 12px;
+}
+
+/* 위험 버튼 (빨간색) — 크기는 ep-submit보다 약간 작게 */
+.da-danger {
+    min-width: 84px;
+    height: 30px;
+    padding: 0 10px;
+    border: none;
+    border-radius: 6px;
+    background: #ef4444;         /* red-500 */
+    color: #fff;
+    font-weight: 600;
+    font-size: 13px;
+    cursor: pointer;
+}
+.da-danger:hover {
+    background: #dc2626;         /* red-600 */
+}
+.da-danger[disabled],
+.da-danger[aria-disabled="true"] {
+    background: #fca5a5;         /* red-300 */
+    cursor: not-allowed;
+}
