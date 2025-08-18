@@ -3,10 +3,10 @@ import ReactDOM from "react-dom/client";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
+import Profile from "./pages/mypage/Profile"; // 실제 페이지 임포트 사용
 
 import { CircularProgress } from "@mui/material";
-// Navigate, NavLink, Outlet 임포트
-import { BrowserRouter, Route, Routes, useLocation, Navigate, NavLink, Outlet } from "react-router-dom"; // [ADDED]
+import { BrowserRouter, Route, Routes, useLocation, Navigate, NavLink, Outlet } from "react-router-dom";
 
 const NavigationBarApp = lazy(() => import("navigationBarApp/App"));
 
@@ -30,18 +30,17 @@ const App = () => {
 export default App;
 
 // 로그인 여부 간단 체크 유틸 (토큰 기준)
-//  - 추후 전역 AuthContext/zustand로 대체 권장
-function isLoggedIn() { // [ADDED]
+function isLoggedIn() {
     return !!localStorage.getItem("accessToken");
 }
 
 // 보호 라우팅: 비로그인 시 /login 으로 이동
-function ProtectedRoute({ children }: { children: JSX.Element }) { // [ADDED]
+function ProtectedRoute({ children }: { children: JSX.Element }) {
     return isLoggedIn() ? children : <Navigate to="/login" replace />;
 }
 
-// 마이페이지 레이아웃 & 임시 페이지들 (실제 파일 생기면 교체해도 됨)
-function MyPageLayout() { // [ADDED - TEMP]
+// 마이페이지 레이아웃 (서브탭 바)
+function MyPageLayout() {
     return (
         <div style={{ padding: "24px" }}>
             <div style={{ display: "flex", gap: 16, borderBottom: "1px solid #eee", marginBottom: 24 }}>
@@ -53,24 +52,20 @@ function MyPageLayout() { // [ADDED - TEMP]
         </div>
     );
 }
-function Profile() { // [ADDED - TEMP]
-    return <div>프로필 화면(임시). 실제 컴포넌트로 대체 예정.</div>;
-}
-function EditProfile() { // [ADDED - TEMP]
+
+/* 임시 페이지들: 이름을 바꿔서 충돌 제거 */
+function TempEditProfile() { // 이름 변경
     return <div>회원정보 수정 화면(임시). 실제 컴포넌트로 대체 예정.</div>;
 }
-function DeleteAccount() { // [ADDED - TEMP]
+function TempDeleteAccount() { // 이름 변경
     return <div>회원탈퇴 화면(임시). 실제 컴포넌트로 대체 예정.</div>;
 }
-function Support() { // [ADDED - TEMP]
+function Support() {
     return <div>고객센터(임시). 실제 컴포넌트로 대체 예정.</div>;
 }
 
-// 현재 경로에 따라 NavBar 노출을 제어하는 내부 컴포넌트(단일 진입점)
 function AppInner() {
     const location = useLocation();
-
-    // /login에서 NavBar 숨김 (필요하면 배열로 확장 가능)
     const hideNav = location.pathname === "/login";
 
     return (
@@ -78,32 +73,31 @@ function AppInner() {
             {/* 조건부 렌더링: /login이면 NavBar 숨김 */}
             {!hideNav && <NavigationBarApp />}
 
-            {/* Routes도 여기서만 정의 (중복 제거) */}
+            {/* 라우트 추가 위치는 여기(그대로 유지) */}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
 
-                {/* 고객센터 라우트 */}
-                <Route path="/support" element={<Support />} /> {/* [ADDED] */}
+                <Route path="/support" element={<Support />} />
 
                 {/* 마이페이지: 보호 라우트 + 중첩 라우팅 */}
                 <Route
                     path="/mypage"
                     element={
-                        <ProtectedRoute> {/* [ADDED] */}
-                            <MyPageLayout /> {/* [ADDED] */}
+                        <ProtectedRoute>
+                            <MyPageLayout />
                         </ProtectedRoute>
                     }
                 >
                     {/* 기본 접속 시 /mypage/profile 로 리다이렉트 */}
-                    <Route index element={<Navigate to="profile" replace />} /> {/* [ADDED] */}
-                    <Route path="profile" element={<Profile />} /> {/* [ADDED] */}
-                    <Route path="edit" element={<EditProfile />} /> {/* [ADDED] */}
-                    <Route path="delete" element={<DeleteAccount />} /> {/* [ADDED] */}
+                    <Route index element={<Navigate to="profile" replace />} />
+                    <Route path="profile" element={<Profile />} /> {/* 실제 Profile.tsx 사용 */}
+                    <Route path="edit" element={<TempEditProfile />} />
+                    <Route path="delete" element={<TempDeleteAccount />} />
                 </Route>
 
                 {/* 존재하지 않는 경로 처리 */}
-                <Route path="*" element={<Navigate to="/" replace />} /> {/* [ADDED] */}
+                <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Suspense>
     );

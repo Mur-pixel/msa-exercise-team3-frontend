@@ -1,0 +1,124 @@
+/* 컨테이너 */
+.pf-wrap {
+    max-width: 960px;
+    margin: 32px auto 80px;
+    padding: 0 24px;
+    box-sizing: border-box;
+}
+
+/* 타이틀 */
+.pf-title {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0 0 6px;
+}
+.pf-desc {
+    margin: 0 0 24px;
+    color: #6b7280; /* gray-500 */
+    font-size: 14px;
+}
+
+/* 상단: 이름/이메일칩 + 아바타 */
+.pf-toprow {
+    display: grid;
+    grid-template-columns: 1fr 140px;
+    gap: 24px;
+    align-items: center;
+    margin-bottom: 16px;
+}
+.pf-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+.pf-name-label {
+    font-size: 22px;
+    font-weight: 700;
+}
+.pf-chip {
+    display: inline-flex;
+    align-items: center;
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: #eef2ff; /* 연보라 느낌 */
+    color: #4f46e5;      /* indigo-600 */
+    font-size: 12px;
+}
+
+/* 아바타 + 수정버튼 */
+.pf-avatar {
+    position: relative;
+    width: 72px;
+    height: 72px;
+}
+.pf-avatar img,
+.pf-avatar-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 12px;
+    background: #e5e7eb; /* gray-200 */
+    object-fit: cover;
+}
+.pf-avatar-edit {
+    position: absolute;
+    right: -6px;
+    bottom: -6px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid #e5e7eb;
+    background: #fff;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* 카드 공통 */
+.pf-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    margin: 16px auto;
+    max-width: 600px;
+    width: 100%;
+}
+.pf-card-title {
+    font-weight: 700;
+    padding: 14px 16px;
+    border-bottom: 1px solid #eef0f2;
+}
+
+/* 행 */
+.pf-row {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 16px;
+    align-items: center;
+    padding: 14px 16px;
+    border-top: 1px solid #f3f4f6; /* 첫 줄 제외 효과 */
+}
+.pf-row:first-of-type {
+    border-top: none;
+}
+.pf-label {
+    color: #6b7280; /* gray-500 */
+    font-size: 14px;
+}
+.pf-value {
+    font-size: 14px;
+}
+
+/* 점표기(마스킹) 비주얼 */
+.pf-dots {
+    letter-spacing: 2px;
+}
+
+/* 반응형 */
+@media (max-width: 640px) {
+    .pf-toprow {
+        grid-template-columns: 1fr 72px;
+    }
+    .pf-row {
+        grid-template-columns: 120px 1fr;
+    }
+}
