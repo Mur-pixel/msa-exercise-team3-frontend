@@ -40,6 +40,13 @@ export default defineConfig({
   module: {
     rules: [
       {
+        test: /\.(png|jpe?g|gif|webp|svg)$/i,
+        type: "asset/resource",                // 파일을 출력하고 URL을 반환
+        generator: {
+          filename: "assets/[name].[hash][ext]" // 출력 경로/이름
+        }
+      },
+      {
         test: /\.svg$/,
         type: "asset",
       },
