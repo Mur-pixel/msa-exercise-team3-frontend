@@ -1,48 +1,61 @@
 /* 컨테이너 */
 .pf-wrap {
-    max-width: 960px;
-    margin: 32px auto 80px;
-    padding: 0 24px;
-    box-sizing: border-box;
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: left;
 }
+
+/* 이 페이지에서 NavBar의 마이페이지 서브탭 숨김 */
+/*body.pf-hide-subtabs .pd-subtabs { display: none; }*/
+
 
 /* 타이틀 */
 .pf-title {
     font-size: 28px;
     font-weight: 800;
     margin: 0 0 6px;
+    text-align: left;
 }
+
+/* 중앙 정렬 */
+.pf-head { text-align: left; } /* 타이틀/설명 중앙 */
 .pf-desc {
     margin: 0 0 24px;
     color: #6b7280; /* gray-500 */
     font-size: 14px;
+    text-align: left; /* 설명도 왼쪽 */
 }
 
-/* 상단: 이름/이메일칩 + 아바타 */
+/* 상단: 이름/이메일칩 */
 .pf-toprow {
-    display: grid;
-    grid-template-columns: 1fr 140px;
-    gap: 24px;
+    display: flex;
+    justify-content: flex-start; /* 왼쪽 정렬 */
     align-items: center;
+    gap: 24px;
     margin-bottom: 16px;
+    text-align: left;
 }
 .pf-name {
-    display: flex;
+    display: flex;      /* 이름과 이메일칩을 가로로 배치 */
     align-items: center;
+    text-align: left;
     gap: 12px;
 }
 .pf-name-label {
     font-size: 22px;
     font-weight: 700;
+    line-height: 1;
 }
 .pf-chip {
     display: inline-flex;
     align-items: center;
-    padding: 6px 12px;
+    padding: 0 10px;
     border-radius: 16px;
-    background: #eef2ff; /* 연보라 느낌 */
-    color: #4f46e5;      /* indigo-600 */
+    background: #e6f1fd; /* 연한 하늘색 느낌 */
+    color: #0C76EF;      /* indigo-600 */
+    height: 24px;
     font-size: 12px;
+    line-height: 1;
 }
 
 /* 아바타 + 수정버튼 */
@@ -79,7 +92,7 @@
     border-radius: 10px;
     background: #fff;
     margin: 16px auto;
-    max-width: 600px;
+    max-width: 560px;   /* ep-form과 동일하게 맞춤 */
     width: 100%;
 }
 .pf-card-title {
@@ -113,11 +126,15 @@
     letter-spacing: 2px;
 }
 
+/* 상단 텍스트를 카드와 같은 폭으로 맞추는 래퍼 */
+.pf-narrow {
+    max-width: 560px;   /* ep-form과 동일 */
+    margin: 0 auto;
+}
+
 /* 반응형 */
 @media (max-width: 640px) {
-    .pf-toprow {
-        grid-template-columns: 1fr 72px;
-    }
+    /* .pf-toprow { grid-template-columns: 1fr 72px; }  */ /* 중앙 배치로 바꿨으니 불필요 */
     .pf-row {
         grid-template-columns: 120px 1fr;
     }

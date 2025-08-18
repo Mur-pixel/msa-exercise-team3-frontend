@@ -16,9 +16,11 @@
 .pd-bar{
     max-width: var(--pd-max);
     margin: 0 auto;
-    display:flex;
-    align-items:center;
-    gap: 20px;
+    /* display:flex;            */ /* 기존 flex 제거 */
+    display: grid;                /* 그리드로 전환 */
+    grid-template-columns: auto 1fr auto;  /* 로고 | 중앙 | 우측메뉴 */
+    align-items:center;           /* 수직 가운데 */
+    column-gap: 20px;             /* 그리드 간격 */
     padding: 12px 16px;
 }
 
@@ -34,16 +36,19 @@
 /* 검색 박스: 부모만 테두리, 버튼 테두리 제거, 오버플로우 숨김 */
 .pd-search{
     position: relative;
-    flex: 1 1 auto;
+    /* flex: 1 1 auto;          */ /* flex 잔재 제거 */
+    justify-self: center;         /* 그리드 중앙열에서 가운데 정렬 */
+    width: 100%;                  /* 가운데 칼럼 가로 확보 */
     display:flex;
     align-items:center;
     height: 46px;
-    max-width: 760px;
+    max-width: 760px;             /* 최대폭 유지 (중앙 고정폭 느낌) */
     border: 2px solid var(--pd-blue);
     border-radius: 9999px;
     padding-left: 16px;
     overflow: hidden;
 }
+
 
 .pd-search-input{
     border: none;
@@ -75,8 +80,10 @@
     gap: 10px;
     white-space: nowrap;
     font-size: 15px;
-    margin-left: auto;
+    /* margin-left: auto; */       /* 그리드에선 불필요 */
+    justify-self: end;             /* 우측 정렬 */
 }
+
 .pd-auth a{
     color: var(--pd-muted);
     text-decoration: none;
@@ -134,7 +141,7 @@
 }
 
 /* 개별 탭 기본 상태: 박스 감싸짐/두꺼운 라인 방지 */
-.pd-subtab { /* ★ 수정 */
+.pd-subtab {
     position: relative;           /* 밑줄을 ::after로 그릴 예정 */
     display: inline-flex;
     align-items: center;
@@ -184,19 +191,19 @@
     .pd-tabs{ gap: 28px; }
     .pd-tab{ font-size:18px; }
 }
+/* 반응형: 모바일에선 검색창을 한 줄 전체로 */
 @media (max-width: 720px){
     .pd-bar{
-        flex-wrap: wrap;
+        grid-template-columns: 1fr;   /* 한 열로 쌓기 */
+        row-gap: 8px;                 /* 세로 간격 */
     }
     .pd-logo{ font-size: 24px; }
-    .pd-auth{
-        order: 3;
-        width:100%;
-        justify-content:flex-end;
-    }
     .pd-search{
-        order: 2;
-        width:100%;
-        max-width: none;
+        justify-self: stretch;        /* 가로 꽉 채움 */
+        max-width: none;              /* 제한 해제 */
+    }
+    .pd-auth{
+        justify-self: end;            /* 우측 정렬 유지 */
+        width: 100%;
     }
 }

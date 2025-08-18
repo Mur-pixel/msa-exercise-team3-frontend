@@ -4,6 +4,8 @@ import ReactDOM from "react-dom/client";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Profile from "./pages/mypage/Profile"; // 실제 페이지 임포트 사용
+import EditProfile from "./pages/mypage/EditProfile.tsx";
+import DeleteAccount from "./pages/mypage/DeleteAccount.tsx";
 
 import { CircularProgress } from "@mui/material";
 import { BrowserRouter, Route, Routes, useLocation, Navigate, NavLink, Outlet } from "react-router-dom";
@@ -43,11 +45,6 @@ function ProtectedRoute({ children }: { children: JSX.Element }) {
 function MyPageLayout() {
     return (
         <div style={{ padding: "24px" }}>
-            <div style={{ display: "flex", gap: 16, borderBottom: "1px solid #eee", marginBottom: 24 }}>
-                <NavLink to="profile">내프로필</NavLink>
-                <NavLink to="edit">회원정보 수정</NavLink>
-                <NavLink to="delete">회원탈퇴</NavLink>
-            </div>
             <Outlet />
         </div>
     );
@@ -92,8 +89,8 @@ function AppInner() {
                     {/* 기본 접속 시 /mypage/profile 로 리다이렉트 */}
                     <Route index element={<Navigate to="profile" replace />} />
                     <Route path="profile" element={<Profile />} /> {/* 실제 Profile.tsx 사용 */}
-                    <Route path="edit" element={<TempEditProfile />} />
-                    <Route path="delete" element={<TempDeleteAccount />} />
+                    <Route path="edit" element={<EditProfile />} />
+                    <Route path="delete" element={<DeleteAccount  />} />
                 </Route>
 
                 {/* 존재하지 않는 경로 처리 */}
