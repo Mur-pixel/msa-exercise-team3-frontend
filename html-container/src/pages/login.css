@@ -1,0 +1,216 @@
+/* 모든 요소에 border-box 적용: padding/border가 width에 포함되도록 */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+:root{
+    --pd-blue:#1673ff;
+    --pd-gray:#e5e5e5;
+    --pd-muted:#7a7a7a;
+    --pd-text:#111;
+}
+
+.login-wrap{
+    min-height: 100vh;
+    display:flex;
+    flex-direction:column;
+    justify-content: center;
+    align-items:center;
+    padding:48px 16px 24px;
+}
+
+.login-logo{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+    margin-bottom:20px;
+}
+.login-logo .logo-mark{ font-size:28px; line-height:1; }
+.login-logo h1{
+    margin:0;
+    font-size:32px;
+    font-weight:800;
+    letter-spacing:-.3px;
+}
+
+.login-card{
+    width:100%;
+    max-width:440px;
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+    padding:16px;
+}
+
+/* (기존) 우측 아이콘이 있는 필드 */
+.field{ position:relative; }
+
+/* (기존) 로그인 입력 공통 스타일 */
+.input{
+    width:100%;
+    height:48px;
+    border:1px solid var(--pd-gray);
+    border-radius:10px;
+    padding:0 14px;
+    font-size:15px;
+    outline:none;
+    transition:border-color .2s, box-shadow .2s;
+    background:#fff;
+
+    /* 혹시 브라우저 기본 margin이 섞였을 수 있어 초기화 */
+    margin: 0;
+    display: block; /* inline 특성에 의한 줄바꿈/여백 이슈 방지 */
+}
+.input:focus{
+    border-color: var(--pd-blue);
+    box-shadow:0 0 0 3px rgba(22,115,255,.12);
+}
+
+/* 우측 아이콘 영역만큼 내부 여백을 늘리되, border-box라 폭 안 커짐 */
+.has-right-icon .input{
+    padding-right:44px; /* 아이콘 영역 만큼 */
+}
+
+/* (기존) 우측 아이콘 버튼 */
+.eye{
+    position:absolute;
+    right:8px; top:50%;
+    transform:translateY(-50%);
+    width:32px; height:32px;
+    display:grid; place-items:center;
+    border:none; background:transparent;
+    cursor:pointer; font-size:16px;
+    /* 클릭 영역이 입력창 위로 와도 포커스/높이 안깨지게 */
+    line-height: 0;
+}
+
+.error{
+    margin:0;
+    color:#e25353;
+    font-size:13px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+    padding-left:4px;
+}
+.error-icon{ font-size:14px; }
+
+.login-btn{
+    height:48px;
+    border:none;
+    border-radius:10px;
+    background: var(--pd-blue);
+    color:#fff;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+}
+.login-btn:disabled{ opacity:.65; cursor:not-allowed; }
+
+.help-links{
+    text-align:center;
+    color:var(--pd-muted);
+    font-size:14px;
+}
+.help-links a{
+    color:inherit; text-decoration:none;
+}
+.help-links a:hover{ text-decoration:underline; }
+.help-links .divider{ margin:0 8px; color:#c9c9c9; }
+
+/* 공통 컨테이너 */
+.sns-row{
+    display:flex;
+    justify-content:center;
+    gap:16px;
+    margin-top:2px;
+}
+
+/* 동그란 아이콘 버튼 베이스 (카카오/네이버용) */
+.sns{
+    width:44px;
+    height:44px;
+    border-radius:50%;
+    border:1px solid var(--pd-gray);
+    background:#fff;
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    padding:0;
+}
+
+/* 아이콘 이미지 크기 통일 */
+.sns-icon{
+    width:28px;
+    height:28px;
+    object-fit:contain;
+    display:block;
+}
+
+/* 브랜드 컬러 */
+.sns--kakao { background:#FEE500; border-color:#F7D400; }
+.sns--naver { background:#1EC800; border-color:#1EC800; }
+.sns--google { background:#fff; border-color:#dadce0; }
+.sns--google svg { display:block; }
+/* 구글 버튼 스타일 */
+.gsi-material-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid var(--pd-gray);
+    background: #fff;
+    cursor: pointer;
+    padding: 0;
+}
+
+/* 아이콘 버튼 컨테이너 정렬(선택) */
+.gsi-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;   /* 카카오/네이버와 동일 */
+    height: 44px;
+    border-radius: 50%;
+    overflow: hidden; /* 라운드 테두리 안 벗어나게 */
+}
+
+.gsi-material-button-icon img {
+    width: 24px;
+    height: 24px;
+    object-fit: contain;
+}
+
+
+.notice{
+    text-align:center;
+    color:var(--pd-muted);
+    font-size:12px;
+    line-height:1.5;
+    margin:6px 0 0;
+}
+
+.signup-btn{
+    display:block;
+    height:48px;
+    line-height:48px;
+    text-align:center;
+    border-radius:10px;
+    border:2px solid var(--pd-blue);
+    color:var(--pd-blue);
+    font-weight:700;
+    text-decoration:none;
+    margin-top:8px;
+}
+
+.login-footer{
+    margin-top:auto;
+    color:#999;
+    font-size:12px;
+    padding:24px 0 8px;
+}
