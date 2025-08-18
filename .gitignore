@@ -1,1 +1,13 @@
-node_modules/
+# deps
+**/node_modules/
+
+# build outputs
+**/dist/
+html-container/@mf-types/
+navigation-bar-app/dist/
+navigation-bar-app/dist/@mf-types/
+navigation-bar-app/dist/@mf-types.zip
+
+# editor/OS
+.DS_Store
+*.log
