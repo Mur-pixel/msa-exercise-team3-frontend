@@ -102,7 +102,82 @@
     text-decoration: none;
 }
 .pd-tab:hover{ color: var(--pd-blue); }
+/* 링크처럼 보이는 로그아웃 버튼 스타일 */
+.pd-linklike-btn{
+    background: transparent;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    color: var(--pd-muted);
+    cursor: pointer;
+}
+.pd-linklike-btn:hover{ color: var(--pd-blue); }
 
+/* (선택) 사용자 인사 문구 */
+.pd-hello{
+    color: var(--pd-muted);
+    margin-right: 4px;
+}
+
+/* === 마이페이지 전용 서브탭 === */
+.pd-subtabs{
+    border-bottom: 1px solid #e5e7eb; /* 밝은 회색 라인 */
+}
+
+/* 탭 컨테이너 간격/정렬 */
+.pd-subtabs-inner {
+    display: flex;
+    gap: 32px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 16px;
+}
+
+/* 개별 탭 기본 상태: 박스 감싸짐/두꺼운 라인 방지 */
+.pd-subtab { /* ★ 수정 */
+    position: relative;           /* 밑줄을 ::after로 그릴 예정 */
+    display: inline-flex;
+    align-items: center;
+    height: 44px;                 /* 탭 바 높이 */
+    padding: 0 4px;
+    color: #222;
+    text-decoration: none;
+    border: none;                 /* 기존 border-bottom 있으면 제거 */
+    background: transparent;      /* 이상한 네모박스 방지 */
+    box-shadow: none;             /* 혹시 남아있는 그림자 제거 */
+}
+
+
+.pd-subtab:hover{ color: var(--pd-blue); }
+
+/* 활성 탭 밑줄 */
+.pd-subtab.is-active {
+    font-weight: bold;
+    border-bottom: 2px solid #000; /* 하단 강조 */
+}
+
+.pd-subtab.is-active::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -1px;      /* 회색 구분선과 '맞닿도록' 살짝 내려 붙임 */
+    height: 2px;       /* 너무 두껍지 않게 */
+    background: #111;  /* 밑줄 색상 */
+    border-radius: 1px;
+}
+
+/* 반응형 간격 조정 */
+@media (max-width: 960px){
+    .pd-subtabs-inner{ gap: 28px; }
+    .pd-subtab{ font-size: 16px; }
+}
+@media (max-width: 720px){
+    .pd-subtabs-inner{
+        gap: 20px;
+        flex-wrap: wrap;
+    }
+}
 /* 반응형 */
 @media (max-width: 960px){
     .pd-bar{ gap:12px; }
