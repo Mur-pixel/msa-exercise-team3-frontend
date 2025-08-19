@@ -25,12 +25,24 @@ export default defineConfig({
     port: 5000,
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, "src")],
+    headers: { "Access-Control-Allow-Origin": "*" },
+    proxy: [
+      {
+        context: ["/navapp"],                    // ★ 이 경로로 들어오는 요청을
+        target: "http://localhost:5001",         // ★ 5001로 프록시
+        changeOrigin: true,
+        pathRewrite: { "^/navapp": "" },         // ★ /navapp 접두사 제거 => /remoteEntry.js 로 전달
+        // secure: false,                         // (HTTPS 리모트라면 필요)
+        // logLevel: "debug",                     // (문제시 디버깅용)
+      },
+    ],
   },
   output: {
     // You need to set a unique value that is not equal to other applications
-    uniqueName: "home_container",
+    uniqueName: "html_container",
     // publicPath must be configured if using manifest
     publicPath: "http://localhost:5000/",
+    crossOriginLoading: "anonymous",
   },
 
   experiments: {
@@ -82,12 +94,11 @@ export default defineConfig({
     ],
   },
   plugins: [
-    new rspack.HtmlRspackPlugin({
-      template: "./index.html",
-    }),
+    new rspack.HtmlRspackPlugin({ template: "./index.html" }),
     new ModuleFederationPlugin(mfConfig),
     isDev ? new RefreshPlugin() : null,
   ].filter(Boolean),
+
   optimization: {
     minimizer: [
       new rspack.SwcJsMinimizerRspackPlugin(),
@@ -96,4 +107,5 @@ export default defineConfig({
       }),
     ],
   },
+  devtool: isDev ? "source-map" : false,
 });

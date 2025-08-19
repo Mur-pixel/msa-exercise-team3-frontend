@@ -6,9 +6,12 @@ import Login from "./pages/Login";
 import Profile from "./pages/mypage/Profile"; // 실제 페이지 임포트 사용
 import EditProfile from "./pages/mypage/EditProfile.tsx";
 import DeleteAccount from "./pages/mypage/DeleteAccount.tsx";
+import Domestic from "./pages/domestic/Domestic.tsx";
+import ThemeList from "./pages/theme/ThemeList";
 
 import { CircularProgress } from "@mui/material";
 import { BrowserRouter, Route, Routes, useLocation, Navigate, NavLink, Outlet } from "react-router-dom";
+import ReviewBoard from "./pages/review/ReviewBoard.tsx";
 
 const NavigationBarApp = lazy(() => import("navigationBarApp/App"));
 
@@ -74,6 +77,9 @@ function AppInner() {
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/domestic" element={<Domestic />} />
+                <Route path="/theme" element={<ThemeList />} />
+                <Route path="/reviews" element={<ReviewBoard />} />
 
                 <Route path="/support" element={<Support />} />
 
