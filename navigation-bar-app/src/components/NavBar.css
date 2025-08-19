@@ -24,13 +24,33 @@
     padding: 12px 16px;
 }
 
-.pd-logo{
+/* 로고 전체 래퍼 */
+.pd-logo {
+    display: flex;             /* 아이콘 + 텍스트 나란히 */
+    align-items: center;
+    gap: 6px;                  /* 간격 */
     font-weight: 800;
     font-size: 28px;
     letter-spacing: .5px;
     color: var(--pd-text);
     text-decoration: none;
     white-space: nowrap;
+}
+
+/* 아이콘 부분 */
+.logo-mark {
+    font-size: 28px;           /* 아이콘 크기 */
+    line-height: 1;
+}
+
+/* 텍스트 부분 */
+.logo-text {
+    font-size: 28px;
+    font-weight: 800;
+    margin: 0;                 /* 기본 h1 여백 제거 */
+    line-height: 1;
+    color: var(--pd-text);
+    letter-spacing: -0.5px;
 }
 
 /* 검색 박스: 부모만 테두리, 버튼 테두리 제거, 오버플로우 숨김 */
