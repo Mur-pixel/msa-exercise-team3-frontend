@@ -1,5 +1,4 @@
-// pages/theme/themeService.ts
-// 👉 서비스/타입 전용 파일 (이미지/카테고리 상수는 UI 파일에서 관리)
+// 서비스/타입 전용 파일 (이미지/카테고리 상수는 UI 파일에서 관리)
 
 export type ThemePlace = {
     place_id: number;
@@ -15,32 +14,18 @@ export type ThemeQuery = {
     category?: string;
     page?: number;
     pageSize?: number;
+    location?: string;
 };
 
-// =====================
-// 임시 목 데이터 (후에 API로 교체)
-// =====================
-const RAW: ThemePlace[] = [
-    {
-        place_id: 101,
-        title: "강원랜드카지노",
-        content:
-            "국내 유일 내국인 출입 가능 카지노로 리조트, 호텔, 스키장 등이 인접해 있습니다.",
-        category: "ACTIVITY",
-        location: "강원특별자치도",
-        address: "강원특별자치도 정선군 고한읍 고한7길 50",
-    },
-    {
-        place_id: 125,
-        title: "삽교호관광지",
-        content:
-            "유람선, 놀이기구, 호수 산책로 등 다양한 체험이 가능한 충남의 대표 가족형 관광지입니다.",
-        category: "ACTIVITY",
-        location: "충청남도",
-        address: "충청남도 당진시 신평면 삽교천3로 79",
-    },
-    // 필요하면 더 추가…
-];
+// 백엔드 응답 타입(필드명은 너희 서버에 맞춰 조정)
+type SearchPlaceResponse = {
+    id?: number; place_id?: number;
+    title: string;
+    category: string;
+    location: string;
+    address: string;
+    content?: string; description?: string;
+};
 
 // 페이지네이션 유틸
 function paginate<T>(arr: T[], page: number, pageSize: number) {
@@ -48,44 +33,53 @@ function paginate<T>(arr: T[], page: number, pageSize: number) {
     return arr.slice(start, start + pageSize);
 }
 
-// =====================
-// 공개 API (목)
-// =====================
+// FE ↔︎ BE 매핑 함수 (필드명 다르면 여기만 고치면 됨)
+function mapToThemePlace(x: SearchPlaceResponse): ThemePlace {
+    return {
+        place_id: x.id ?? x.place_id ?? 0,
+        title: x.title,
+        content: x.content ?? x.description ?? "",
+        category: x.category,
+        location: x.location,
+        address: x.address,
+    };
+}
+
+// 환경변수 있으면 사용, 없으면 로컬 8080으로
+// 프록시 우회, 백엔드로 직통
+const API_BASE =
+    (typeof import.meta !== "undefined" && (import.meta as any).env?.VITE_API_BASE)
+    || "http://localhost:7777/place";
+
+
 export async function listThemePlaces(
     query: ThemeQuery
 ): Promise<{ data: ThemePlace[]; total: number }> {
-    const { keyword = "", category = "", page = 1, pageSize = 10 } = query;
+    const payload = {
+        title: query.keyword?.trim() || null,
+        category: query.category || null,
+        location: query.location || null,
+    };
 
-    // 필터링
-    const kw = keyword.trim().toLowerCase();
-    let data = RAW.filter((p) => {
-        const byKw = kw
-            ? p.title.toLowerCase().includes(kw) ||
-            p.content.toLowerCase().includes(kw)
-            : true;
-        const byCat = category ? p.category === category : true;
-        return byKw && byCat;
+    const res = await fetch(`${API_BASE}/search`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
     });
+    if (!res.ok) {
+        const txt = await res.text().catch(() => "");
+        throw new Error(`Search failed: ${res.status} ${txt}`);
+    }
 
-    const total = data.length;
-    data = paginate(data, page, pageSize);
+    const json = (await res.json()) as SearchPlaceResponse[];
 
-    // 실제 API 딜레이 시뮬
-    await new Promise((r) => setTimeout(r, 200));
+    // 백엔드가 페이지네이션을 아직 안 주니까 프론트에서 잘라서 사용
+    const all = json.map(mapToThemePlace);
+    const total = all.length;
+    const page = Math.max(1, query.page ?? 1);
+    const size = Math.max(1, query.pageSize ?? 10);
+    const start = (page - 1) * size;
+    const data = all.slice(start, start + size);
+
     return { data, total };
 }
-
-// =====================
-// 실제 백엔드로 교체 시 예시
-// =====================
-// export async function listThemePlaces(query: ThemeQuery) {
-//   const url = new URL("/api/theme", window.location.origin);
-//   if (query.keyword)  url.searchParams.set("keyword", query.keyword);
-//   if (query.category) url.searchParams.set("category", query.category);
-//   url.searchParams.set("page", String(query.page ?? 1));
-//   url.searchParams.set("pageSize", String(query.pageSize ?? 10));
-//
-//   const res = await fetch(url.toString());
-//   if (!res.ok) throw new Error("Failed to fetch");
-//   return (await res.json()) as { data: ThemePlace[]; total: number };
-// }

@@ -111,7 +111,7 @@ export default function ThemeList() {
             <ThemeCategoryRow
                 categories={THEME_CATS}
                 value={category}
-                onChange={(next) => { setCategory(next); setPage(1); }}
+                onChange={(next) => { setCategory(next); setPage(1); }} // ← 여기서 카테고리 변경
             />
 
             {/* 알약 검색바 */}

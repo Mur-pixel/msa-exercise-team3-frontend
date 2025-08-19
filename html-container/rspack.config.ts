@@ -28,12 +28,19 @@ export default defineConfig({
     headers: { "Access-Control-Allow-Origin": "*" },
     proxy: [
       {
-        context: ["/navapp"],                    // ★ 이 경로로 들어오는 요청을
-        target: "http://localhost:5001",         // ★ 5001로 프록시
+        context: ["/navapp"],
+        target: "http://localhost:5001",
         changeOrigin: true,
-        pathRewrite: { "^/navapp": "" },         // ★ /navapp 접두사 제거 => /remoteEntry.js 로 전달
+        pathRewrite: { "^/navapp": "" },
         // secure: false,                         // (HTTPS 리모트라면 필요)
         // logLevel: "debug",                     // (문제시 디버깅용)
+      },
+      {
+        context: ["/auth", "/account", "/place"],
+        target: "http://localhost:7777", // 백엔드 포트
+        changeOrigin: true,
+        // 백엔드가 '/api' prefix가 **없다면** 주석 해제:
+        // pathRewrite: { "^/api": "" },
       },
     ],
   },
