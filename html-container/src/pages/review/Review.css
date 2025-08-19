@@ -1,0 +1,76 @@
+/* 래퍼 */
+.rv-container{ max-width:960px; margin:0 auto; padding:0 16px; }
+
+/* 검색줄 */
+.rv-search{ display:flex; gap:10px; margin: 8px 0 18px; }
+.rv-input{
+    flex:1; height:38px; border:1px solid #e5e7eb; border-radius:10px;
+    padding:0 12px; outline:none; background:#fff;
+}
+.rv-input:focus{ box-shadow:0 0 0 3px rgba(22,115,255,.12); border-color:#1673ff; }
+.rv-btn{
+    height:38px; padding:0 14px; border:0; border-radius:10px;
+    background:#1673ff; color:#fff; font-weight:700; cursor:pointer;
+}
+
+/* 리스트 */
+.rv-list{ list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:14px; }
+.rv-empty{
+    border:1px dashed #e5e7eb; background:#fafafa; color:#9aa0a6;
+    border-radius:12px; padding:20px; text-align:center;
+}
+
+/* 카드 */
+.rv-card{
+    background:#fff;
+    border:1px solid #eef2f7;
+    border-radius:16px;
+    box-shadow:0 1px 2px rgba(0,0,0,.04);
+    padding:16px 18px;
+}
+
+/* 헤더 */
+.rv-header{ display:flex; align-items:center; gap:12px; }
+.rv-avatar{
+    --size: 34px;
+    width:var(--size); height:var(--size); border-radius:999px;
+    display:grid; place-items:center; font-weight:700; color:#fff;
+    background: linear-gradient(135deg, #60a5fa, #a78bfa);
+}
+.rv-who{ color:#64748b; font-size:13px; }
+.rv-name{ color:#111; font-weight:700; margin-right:6px; }
+.rv-date{ color:#94a3b8; }
+.rv-dot{ color:#cbd5e1; margin: 0 6px; }
+
+/* 제목 */
+.rv-title{
+    margin:10px 0 8px;
+    font-size:22px; font-weight:800; letter-spacing:-0.02em;
+    display:flex; align-items:center; gap:10px;
+}
+.rv-title::before{
+    content:""; width:10px; height:26px; border-radius:3px; background:#1673ff;
+    box-shadow: 0 1px 0 rgba(0,0,0,.04);
+}
+
+/* 본문 – 오른쪽 인용선 */
+.rv-quote{
+    position:relative;
+    margin:0; padding: 4px 16px 4px 0;
+    line-height:1.75; color:#111; font-size:16px;
+}
+.rv-quote::after{
+    content:""; position:absolute; right:0; top:0; bottom:0;
+    width:3px; border-radius:2px; background:#eef2f7;
+}
+
+/* 페이지네이션 */
+.rv-pager{ display:flex; justify-content:center; align-items:center; gap:8px; margin:18px 0; }
+.rv-page{
+    min-width:38px; height:38px; padding:0 12px; border:1px solid #e5e7eb;
+    background:#fff; border-radius:10px; cursor:pointer; font-weight:700;
+}
+.rv-page:hover{ background:#f8fafc; }
+.rv-page.is-active{ background:#1673ff; color:#fff; border-color:#1673ff; }
+.rv-page:disabled{ opacity:.5; cursor:not-allowed; }
+.rv-ellipsis{ color:#9aa0a6; }
