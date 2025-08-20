@@ -10,6 +10,7 @@ import Domestic from "./pages/domestic/Domestic.tsx";
 import KakaoCallback from "./pages/auth/KakaoCallback.tsx";
 import ReviewBoard from "./pages/review/ReviewBoard.tsx";
 import ThemeList from "./pages/theme/ThemeList.tsx";
+import SignUp from "./pages/auth/SignUp.tsx";
 
 import { CircularProgress } from "@mui/material";
 import {
@@ -132,6 +133,7 @@ function AppInner() {
                 <Route path="/domestic" element={<Domestic />} />
                 <Route path="/theme" element={<ThemeList />} />
                 <Route path="/reviews" element={<ReviewBoard />} />
+                <Route path="/signup" element={<SignUp />} />
                 <Route path="/oauth/kakao/callback" element={<KakaoCallback />} />
 
                 <Route path="/support" element={<Support />} />
