@@ -3,48 +3,82 @@ import ReactDOM from "react-dom/client";
 
 import Home from "./pages/Home";
 import Login from "./pages/Login";
-import Profile from "./pages/mypage/Profile"; // 실제 페이지 임포트 사용
+import Profile from "./pages/mypage/Profile";
 import EditProfile from "./pages/mypage/EditProfile.tsx";
 import DeleteAccount from "./pages/mypage/DeleteAccount.tsx";
 import Domestic from "./pages/domestic/Domestic.tsx";
-import ThemeList from "./pages/theme/ThemeList";
+import KakaoCallback from "./pages/auth/KakaoCallback.tsx";
+import ReviewBoard from "./pages/review/ReviewBoard.tsx";
+import ThemeList from "./pages/theme/ThemeList.tsx";
 
 import { CircularProgress } from "@mui/material";
-import { BrowserRouter, Route, Routes, useLocation, Navigate, NavLink, Outlet } from "react-router-dom";
-import ReviewBoard from "./pages/review/ReviewBoard.tsx";
+import {
+    BrowserRouter,
+    Route,
+    Routes,
+    useLocation,
+    Navigate,
+    Outlet,
+} from "react-router-dom";
 
 const NavigationBarApp = lazy(() => import("navigationBarApp/App"));
 
-const App = () => {
-    const [isNavigationBarLoaded, setIsNavigationBarLoaded] = useState(false);
+/** localStorage ↔ React state 동기화 훅 */
+function useAuthSync() {
+    const [token, setToken] = useState<string | null>(() =>
+        localStorage.getItem("accessToken")
+    );
+    const [user, setUser] = useState<any>(() => {
+        const raw = localStorage.getItem("user");
+        try {
+            return raw ? JSON.parse(raw) : null;
+        } catch {
+            return null;
+        }
+    });
 
     useEffect(() => {
-        import("navigationBarApp/App")
-            .then(() => setIsNavigationBarLoaded(true))
-            .catch((err) => console.error("Failed to load navigation bar:", err));
+        const refresh = () => {
+            setToken(localStorage.getItem("accessToken"));
+            try {
+                const raw = localStorage.getItem("user");
+                setUser(raw ? JSON.parse(raw) : null);
+            } catch {
+                setUser(null);
+            }
+        };
+
+        const onStorage = (e: StorageEvent) => {
+            if (e.key === "accessToken" || e.key === "user") refresh();
+        };
+
+        // 커스텀 이벤트(로그인 완료 시 프론트 어딘가에서 dispatch 가능)
+        const onAuthChanged = () => refresh();
+
+        window.addEventListener("storage", onStorage);
+        window.addEventListener("auth:changed", onAuthChanged as EventListener);
+
+        return () => {
+            window.removeEventListener("storage", onStorage);
+            window.removeEventListener("auth:changed", onAuthChanged as EventListener);
+        };
     }, []);
 
-    return (
-        <BrowserRouter>
-            {/* App에서는 NavBar/Routes를 렌더링하지 않고 AppInner만 둡니다. */}
-            <AppInner />
-        </BrowserRouter>
-    );
-};
-
-export default App;
-
-// 로그인 여부 간단 체크 유틸 (토큰 기준)
-function isLoggedIn() {
-    return !!localStorage.getItem("accessToken");
+    return { token, user, setToken, setUser };
 }
 
-// 보호 라우팅: 비로그인 시 /login 으로 이동
-function ProtectedRoute({ children }: { children: JSX.Element }) {
-    return isLoggedIn() ? children : <Navigate to="/login" replace />;
+// 보호 라우팅: 비로그인 시 /login
+function ProtectedRoute({
+                            children,
+                            token,
+                        }: {
+    children: JSX.Element;
+    token: string | null;
+}) {
+    return token ? children : <Navigate to="/login" replace />;
 }
 
-// 마이페이지 레이아웃 (서브탭 바)
+// 마이페이지 레이아웃
 function MyPageLayout() {
     return (
         <div style={{ padding: "24px" }}>
@@ -53,63 +87,81 @@ function MyPageLayout() {
     );
 }
 
-/* 임시 페이지들: 이름을 바꿔서 충돌 제거 */
-function TempEditProfile() { // 이름 변경
-    return <div>회원정보 수정 화면(임시). 실제 컴포넌트로 대체 예정.</div>;
-}
-function TempDeleteAccount() { // 이름 변경
-    return <div>회원탈퇴 화면(임시). 실제 컴포넌트로 대체 예정.</div>;
-}
-function Support() {
-    return <div>고객센터(임시). 실제 컴포넌트로 대체 예정.</div>;
-}
+const App = () => {
+    return (
+        <BrowserRouter>
+            <AppInner />
+        </BrowserRouter>
+    );
+};
+
+export default App;
 
 function AppInner() {
     const location = useLocation();
-    const hideNav = location.pathname === "/login";
+    // 로그인/카카오 콜백 페이지에서는 네비바 숨김
+    const hideNav =
+        location.pathname === "/login" ||
+        location.pathname === "/oauth/kakao/callback";
+
+    // 전역 인증 상태 동기화
+    const { token, user, setToken, setUser } = useAuthSync();
+
+    // 네비에서 사용할 로그아웃 핸들러 (원격앱에 props로 넘김)
+    const onLogout = () => {
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
+        setToken(null);
+        setUser(null);
+        // 전체 앱에 알리기(선택)
+        window.dispatchEvent(new CustomEvent("auth:changed"));
+        // 메인으로 이동
+        window.location.href = "/";
+    };
 
     return (
         <Suspense fallback={<CircularProgress />}>
-            {/* 조건부 렌더링: /login이면 NavBar 숨김 */}
-            {!hideNav && <NavigationBarApp />}
+            {!hideNav && (
+                <NavigationBarApp token={token} user={user} onLogout={onLogout} />
+            )}
 
-            {/* 라우트 추가 위치는 여기(그대로 유지) */}
             <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
+
                 <Route path="/domestic" element={<Domestic />} />
                 <Route path="/theme" element={<ThemeList />} />
                 <Route path="/reviews" element={<ReviewBoard />} />
+                <Route path="/oauth/kakao/callback" element={<KakaoCallback />} />
 
                 <Route path="/support" element={<Support />} />
 
-                {/* 마이페이지: 보호 라우트 + 중첩 라우팅 */}
                 <Route
                     path="/mypage"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute token={token}>
                             <MyPageLayout />
                         </ProtectedRoute>
                     }
                 >
-                    {/* 기본 접속 시 /mypage/profile 로 리다이렉트 */}
                     <Route index element={<Navigate to="profile" replace />} />
-                    <Route path="profile" element={<Profile />} /> {/* 실제 Profile.tsx 사용 */}
+                    <Route path="profile" element={<Profile />} />
                     <Route path="edit" element={<EditProfile />} />
-                    <Route path="delete" element={<DeleteAccount  />} />
+                    <Route path="delete" element={<DeleteAccount />} />
                 </Route>
 
-                {/* 존재하지 않는 경로 처리 */}
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Suspense>
     );
 }
 
-const container = document.getElementById("app") as HTMLElement;
-if (!container) {
-    throw new Error("Root container #app not found");
+/* 임시 페이지들 */
+function Support() {
+    return <div>고객센터(임시). 실제 컴포넌트로 대체 예정.</div>;
 }
 
+const container = document.getElementById("app") as HTMLElement;
+if (!container) throw new Error("Root container #app not found");
 const root = ReactDOM.createRoot(container);
 root.render(<App />);

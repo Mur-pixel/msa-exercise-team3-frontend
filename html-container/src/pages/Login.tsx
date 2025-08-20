@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from "react";
+// src/pages/Login.tsx
+import React, { useEffect, useRef, useState, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import "./login.css";
 
 import kakaoLogo from "../assets/social/kakao.png";
@@ -10,26 +12,40 @@ declare global {
     }
 }
 
+// 안전하게 env 읽기 (rspack에서도 동작하도록 any 캐스팅)
+const M = (typeof import.meta !== "undefined" ? (import.meta as any).env : {}) || {};
+
+// 백엔드 오리진(팝업 최종 페이지가 postMessage를 보낼 origin)
+// 예) 개발: http://127.0.0.1:7777  /  배포: https://api.your-domain.com
+const API_ORIGIN: string = M.VITE_API_ORIGIN || "http://127.0.0.1:7777";
+
+// 카카오 인증 시작 엔드포인트
+// - 백엔드에서 카카오 authorize URL로 302 리다이렉트 해주는 API
+// - devServer 프록시를 쓸 거면 경로만 써도 OK.
+const KAKAO_START_PATH: string =
+    M.VITE_KAKAO_START_PATH || "/account/kakao-authentication/start";
+
 export default function Login() {
+    const navigate = useNavigate();
+
     const [id, setId] = useState("");
     const [pw, setPw] = useState("");
 
-    // 이메일/비밀번호 각각의 에러 상태를 분리
+    // 이메일/비밀번호 각각의 에러 상태
     const [idError, setIdError] = useState<string | null>(null);
     const [pwError, setPwError] = useState<string | null>(null);
 
     const [submitting, setSubmitting] = useState(false);
 
-    // 구글 로그인 콜백: credential(JWT)을 서버로 보내 검증하세요.
+    // ====== Google One Tap 데모 콜백 ======
     const handleGoogleCredential = (response: any) => {
         const credential = response?.credential;
         if (!credential) return;
-        // TODO: 서버로 전달해서 검증 (aud/iss/exp, 서명 확인)
-        // await fetch("/api/auth/google", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({ credential }) })
-        alert("Google credential 받은 상태(데모): " + credential.slice(0, 16) + "...");
+        // 데모: 실제론 credential 서버 검증
+        // alert("Google credential: " + credential.slice(0, 16) + "...");
     };
 
-    // 구글 버튼 렌더 (SDK 로드 후 실행)
+    // ====== Google 버튼 렌더 (SDK 로드 후) ======
     useEffect(() => {
         let timer: number | undefined;
 
@@ -37,7 +53,6 @@ export default function Login() {
             const g = window.google?.accounts?.id;
             if (!g) return false;
 
-            // index.html의 g_id_onload에 박아둔 client_id를 재사용
             const htmlClientId =
                 document.getElementById("g_id_onload")?.getAttribute("data-client_id") || undefined;
 
@@ -55,18 +70,18 @@ export default function Login() {
             const el = document.getElementById("gsi-btn"); // 버튼을 렌더링할 자리
             if (el) {
                 g.renderButton(el, {
-                    type: "icon",           // 아이콘 전용
-                    shape: "circle",        // 동그란 형태
-                    size: "large",          // small | medium | large
-                    theme: "outline",       // outline | filled_blue | filled_black
+                    type: "icon", // 아이콘 전용
+                    shape: "circle",
+                    size: "large",
+                    theme: "outline",
                 });
                 return true;
             }
             return false;
         };
 
-        // SDK가 늦게 로드될 수 있으니 폴링
         if (!init()) {
+            // SDK가 늦게 로드될 수 있으니 폴링
             timer = window.setInterval(() => {
                 if (init()) window.clearInterval(timer);
             }, 200) as unknown as number;
@@ -76,19 +91,17 @@ export default function Login() {
         };
     }, []);
 
+    // ====== 기본 로그인 제출 (데모) ======
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        // 제출 시 기존 에러 초기화
         setIdError(null);
         setPwError(null);
 
-        // 이메일 비었을 때
         if (!id.trim()) {
             setIdError("이메일을 입력해 주세요.");
             return;
         }
-        // 비밀번호 비었을 때
         if (!pw.trim()) {
             setPwError("비밀번호를 입력해 주세요.");
             return;
@@ -97,16 +110,82 @@ export default function Login() {
         try {
             setSubmitting(true);
             // TODO: 실제 백엔드 연동
-            // const { data } = await axios.post("/api/auth/login", { id, pw });
-            await new Promise((r) => setTimeout(r, 700)); // 데모용
-            alert(`로그인 시도: ${id}`);
+            await new Promise((r) => setTimeout(r, 700)); // 데모
+            // alert(`로그인 시도: ${id}`);
         } catch (err) {
-            // 공통 실패 메시지를 비밀번호 칸 하단에 노출 (원하면 토스트 등으로 분리 가능)
             setPwError("아이디 또는 비밀번호를 확인해 주세요.");
         } finally {
             setSubmitting(false);
         }
     };
+
+    // ====== 카카오 팝업 + postMessage 수신 ======
+    const popupRef = useRef<Window | null>(null);
+
+    useEffect(() => {
+        const onMessage = (ev: MessageEvent) => {
+            // 백엔드(팝업 페이지)의 오리진 검증 (http://.. 또는 https://.. 포함)
+            if (ev.origin !== API_ORIGIN) return;
+
+            try {
+                const data = ev.data as
+                    | { userToken: string; user: { name: string; email: string } }
+                    | {
+                    newUser: true;
+                    loginType: "KAKAO";
+                    temporaryUserToken: string;
+                    user: { name: string; email: string };
+                };
+
+                // 기존 사용자
+                if ((data as any).userToken) {
+                    const { userToken, user } = data as any;
+                    localStorage.setItem("accessToken", userToken);
+                    localStorage.setItem("user", JSON.stringify(user));
+                    // 전역 알림 → App의 useAuthSync 훅이 감지
+                    window.dispatchEvent(new CustomEvent("auth:changed"));
+                    // 메인으로 이동
+                    navigate("/", { replace: true });
+                }
+                // 신규 사용자 (추가정보 페이지로 유도)
+                else if ((data as any).newUser) {
+                    const { temporaryUserToken, user } = data as any;
+                    localStorage.setItem("temporaryUserToken", temporaryUserToken);
+                    localStorage.setItem("user", JSON.stringify(user));
+                    window.dispatchEvent(new CustomEvent("auth:changed"));
+                    // TODO: 신규 가입 추가정보 페이지로 이동
+                    navigate("/", { replace: true });
+                }
+            } finally {
+                // 팝업 닫기
+                if (popupRef.current && !popupRef.current.closed) popupRef.current.close();
+                popupRef.current = null;
+            }
+        };
+
+        window.addEventListener("message", onMessage);
+        return () => window.removeEventListener("message", onMessage);
+    }, [navigate]);
+
+    // 팝업 열기
+    const openKakaoPopup = useCallback(() => {
+        const w = 460;
+        const h = 680;
+        const y = window.top.outerHeight / 2 + window.top.screenY - h / 2;
+        const x = window.top.outerWidth / 2 + window.top.screenX - w / 2;
+
+        // dev: 프록시 사용 시 PATH만 호출 → http://localhost:5000/account/... 로 뜸
+        // prod: VITE_KAKAO_START_PATH를 절대 URL로 넣어도 됩니다.
+        popupRef.current = window.open(
+            KAKAO_START_PATH,
+            "kakao-login",
+            `width=${w},height=${h},left=${x},top=${y},resizable=no,scrollbars=yes`
+        );
+
+        if (!popupRef.current) {
+            alert("팝업이 차단되었습니다. 브라우저 팝업 허용을 확인해 주세요.");
+        }
+    }, []);
 
     return (
         <div className="login-wrap">
@@ -127,7 +206,6 @@ export default function Login() {
                         autoComplete="username"
                         className="input"
                     />
-                    {/* 이메일 에러 메시지 */}
                     {idError && (
                         <p className="error">
                             <span className="error-icon">ⓘ</span> {idError}
@@ -136,7 +214,7 @@ export default function Login() {
                 </div>
 
                 {/* 비밀번호 */}
-                <div className="field">{/* has-right-icon 제거 */}
+                <div className="field">
                     <input
                         type="password"
                         value={pw}
@@ -146,7 +224,6 @@ export default function Login() {
                         autoComplete="current-password"
                         className="input"
                     />
-                    {/* 비밀번호 에러 메시지 */}
                     {pwError && (
                         <p className="error">
                             <span className="error-icon">ⓘ</span> {pwError}
@@ -164,29 +241,30 @@ export default function Login() {
                     <a href="/find-password">비밀번호 찾기</a>
                 </div>
 
-                {/* 소셜 로그인 섹션 (카카오 → 네이버 → 구글 순) */}
+                {/* 소셜 로그인 */}
                 <div className="sns-row" aria-label="소셜 로그인">
-                    {/* 카카오: 로컬 PNG 아이콘 */}
+                    {/* 카카오: 팝업 + postMessage */}
                     <button
                         type="button"
-                        className="sns sns--kakao"                // 스타일 클래스 변경
-                        onClick={() => alert("카카오 로그인")}
+                        className="sns sns--kakao"
+                        onClick={openKakaoPopup}
                         aria-label="카카오로 로그인"
+                        title="카카오 로그인"
                     >
-                        <img src={kakaoLogo} alt="카카오" className="sns-icon" />  {/* 이미지 아이콘 */}
+                        <img src={kakaoLogo} alt="카카오" className="sns-icon" />
                     </button>
 
-                    {/* 네이버: 로컬 PNG 아이콘 */}
+                    {/* 네이버: 자리만 유지 (나중에 연동) */}
                     <button
                         type="button"
-                        className="sns sns--naver"                // 스타일 클래스 변경
+                        className="sns sns--naver"
                         onClick={() => alert("네이버 로그인")}
                         aria-label="네이버로 로그인"
                     >
-                        <img src={naverLogo} alt="네이버" className="sns-icon" />  {/* 이미지 아이콘 */}
+                        <img src={naverLogo} alt="네이버" className="sns-icon" />
                     </button>
 
-                    {/* 구글: 인라인 SVG 아이콘 + OAuth 리다이렉트 */}
+                    {/* 구글: OAuth 리다이렉트 (데모) */}
                     <button
                         type="button"
                         className="sns sns--google"
@@ -202,9 +280,12 @@ export default function Login() {
                             <path fill="none" d="M0 0h48v48H0z"/>
                         </svg>
                     </button>
+
+                    {/* 구글 버튼을 렌더링할 숨김 타겟 (경고 방지) */}
+                    <div id="gsi-btn" style={{ display: "none" }} />
                 </div>
 
-                {/* 아래 알럿(공지) – 기존 스타일 그대로 사용 */}
+                {/* 공지 */}
                 <p className="notice">
                     개인정보 보호를 위해 공유 PC에서 사용 시
                     <br /> SNS 계정의 로그아웃 상태를 꼭 확인해 주세요.

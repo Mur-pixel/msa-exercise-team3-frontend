@@ -47,7 +47,7 @@ export default function Profile() {
                         </div>
                     </div>
                 </section>
-            </div> 
+            </div>
 
             {/* 카드: 계정 정보 */}
             <section className="pf-card">

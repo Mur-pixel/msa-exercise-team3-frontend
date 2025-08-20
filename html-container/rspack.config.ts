@@ -36,12 +36,13 @@ export default defineConfig({
         // logLevel: "debug",                     // (문제시 디버깅용)
       },
       {
-        context: ["/auth", "/account", "/place"],
+        context: ["/auth", "/place"],
         target: "http://localhost:7777", // 백엔드 포트
         changeOrigin: true,
         // 백엔드가 '/api' prefix가 **없다면** 주석 해제:
         // pathRewrite: { "^/api": "" },
       },
+      { context: ["/account"], target: "http://127.0.0.1:7777", changeOrigin: true },
     ],
   },
   output: {
@@ -103,6 +104,10 @@ export default defineConfig({
   plugins: [
     new rspack.HtmlRspackPlugin({ template: "./index.html" }),
     new ModuleFederationPlugin(mfConfig),
+    new rspack.DefinePlugin({
+      "import.meta.env.VITE_API_ORIGIN": JSON.stringify(process.env.VITE_API_ORIGIN || "http://127.0.0.1:7777"),
+      "import.meta.env.VITE_KAKAO_START_PATH": JSON.stringify(process.env.VITE_KAKAO_START_PATH || "/account/kakao-authentication/start"),
+    }),
     isDev ? new RefreshPlugin() : null,
   ].filter(Boolean),
 
