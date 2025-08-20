@@ -1,13 +1,17 @@
 // pages/review/ReviewBoard.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { listReviews, Review, ReviewQuery, maskName, formatDate } from "./reviewService";
+import { listReviewsByPlace, Review, ReviewQuery, maskName, formatDate } from "./reviewService";
 import "./Review.css";
 
 const PAGE_SIZE = 10;
 
 export default function ReviewBoard() {
     const [sp, setSp] = useSearchParams();
+
+    // placeId를 URL에서 받음. 없으면 임시 기본값 사용
+    const placeId = Number(sp.get("placeId") ?? 101);
+
     const [page, setPage] = useState<number>(Number(sp.get("page") ?? 1));
     const [keyword, setKeyword] = useState(sp.get("keyword") ?? "");
     const [loading, setLoading] = useState(false);
@@ -15,21 +19,27 @@ export default function ReviewBoard() {
     const [total, setTotal] = useState(0);
 
     const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
-    const query: ReviewQuery = useMemo(() => ({ page, pageSize: PAGE_SIZE, keyword }), [page, keyword]);
+    const query: ReviewQuery = useMemo(
+        () => ({ page, pageSize: PAGE_SIZE, keyword }),
+        [page, keyword]
+    );
 
+    // URL 동기화
     useEffect(() => {
         const next = new URLSearchParams();
+        next.set("placeId", String(placeId));
         if (keyword) next.set("keyword", keyword);
         next.set("page", String(page));
         setSp(next, { replace: true });
-    }, [page, keyword, setSp]);
+    }, [placeId, page, keyword, setSp]);
 
+    // 데이터 로드
     useEffect(() => {
         let alive = true;
         (async () => {
             setLoading(true);
             try {
-                const { data, total } = await listReviews(query);
+                const { data, total } = await listReviewsByPlace(placeId, query);
                 if (!alive) return;
                 setItems(data);
                 setTotal(total);
@@ -38,7 +48,7 @@ export default function ReviewBoard() {
             }
         })();
         return () => { alive = false; };
-    }, [query]);
+    }, [placeId, query]);
 
     const go = (p: number) => {
         if (p < 1 || p > totalPages) return;
@@ -62,7 +72,7 @@ export default function ReviewBoard() {
 
     return (
         <div className="rv-container">
-            {/* 상단 검색줄(간단) */}
+            {/* 상단 검색줄 */}
             <form className="rv-search" onSubmit={onSubmit}>
                 <input
                     className="rv-input"
@@ -96,15 +106,13 @@ export default function ReviewBoard() {
                             </header>
 
                             <h3 className="rv-title">{r.title}</h3>
-
-                            {/* 본문: 오른쪽 얇은 인용 라인 */}
                             <blockquote className="rv-quote">{r.body}</blockquote>
                         </li>
                     ))
                 )}
             </ul>
 
-            {/* 페이지네이션 (Theme와 동일 스타일을 재사용해도 됩니다) */}
+            {/* 페이지네이션 */}
             <nav className="rv-pager" aria-label="페이지네이션">
                 <button className="rv-page" onClick={() => go(1)} disabled={page === 1} aria-label="첫 페이지">«</button>
                 <button className="rv-page" onClick={() => go(page - 1)} disabled={page === 1} aria-label="이전 페이지">‹</button>
