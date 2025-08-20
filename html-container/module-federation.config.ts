@@ -1,7 +1,7 @@
 export const mfConfig = {
   name: "html_container",
   remotes: {
-    navigationBarApp: "navigationBarApp@http://localhost:5001/remoteEntry.js",
+    navigationBarApp: "navigationBarApp@/navapp/remoteEntry.js",
   },
   shared: {
     react: { singleton: true, requiredVersion: "^18.2.0" },

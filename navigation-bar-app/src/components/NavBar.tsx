@@ -57,7 +57,10 @@ export default function NavBar({
     return (
         <header className="pd-header">
             <div className="pd-bar">
-                <Link to="/" className="pd-logo">Place Data</Link>
+                <Link to="/" className="pd-logo">
+                    <span className="logo-mark">🌊</span>
+                    <h1 className="logo-text">Place Data</h1>
+                </Link>
 
                 <form className="pd-search" onSubmit={onSubmit} role="search" aria-label="사이트 검색">
                     <input

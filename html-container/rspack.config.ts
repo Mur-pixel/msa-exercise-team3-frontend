@@ -25,12 +25,31 @@ export default defineConfig({
     port: 5000,
     historyApiFallback: true,
     watchFiles: [path.resolve(__dirname, "src")],
+    headers: { "Access-Control-Allow-Origin": "*" },
+    proxy: [
+      {
+        context: ["/navapp"],
+        target: "http://localhost:5001",
+        changeOrigin: true,
+        pathRewrite: { "^/navapp": "" },
+        // secure: false,                         // (HTTPS 리모트라면 필요)
+        // logLevel: "debug",                     // (문제시 디버깅용)
+      },
+      {
+        context: ["/auth", "/account", "/place"],
+        target: "http://localhost:7777", // 백엔드 포트
+        changeOrigin: true,
+        // 백엔드가 '/api' prefix가 **없다면** 주석 해제:
+        // pathRewrite: { "^/api": "" },
+      },
+    ],
   },
   output: {
     // You need to set a unique value that is not equal to other applications
-    uniqueName: "home_container",
+    uniqueName: "html_container",
     // publicPath must be configured if using manifest
     publicPath: "http://localhost:5000/",
+    crossOriginLoading: "anonymous",
   },
 
   experiments: {
@@ -82,12 +101,11 @@ export default defineConfig({
     ],
   },
   plugins: [
-    new rspack.HtmlRspackPlugin({
-      template: "./index.html",
-    }),
+    new rspack.HtmlRspackPlugin({ template: "./index.html" }),
     new ModuleFederationPlugin(mfConfig),
     isDev ? new RefreshPlugin() : null,
   ].filter(Boolean),
+
   optimization: {
     minimizer: [
       new rspack.SwcJsMinimizerRspackPlugin(),
@@ -96,4 +114,5 @@ export default defineConfig({
       }),
     ],
   },
+  devtool: isDev ? "source-map" : false,
 });
