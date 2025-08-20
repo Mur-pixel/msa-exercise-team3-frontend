@@ -1,0 +1,76 @@
+/* === 래퍼: 잘림 방지 & 안쪽 여백 확보 === */
+.map-wrapper {
+    position: relative;
+    width: 100%;
+    /* height: 100%;              */ /* [삭제] 높이는 아래 .map-box .map-wrapper가 auto로 관리 */
+    border-radius: 12px;
+    overflow: visible;              /* [변경] hidden → visible : 가장자리 잘림 방지 */
+    background: #fff;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.04);
+    padding: 8px;                   /* [추가] 스트로크가 가장자리에서 잘리는 현상 방지 */
+    box-sizing: border-box;         /* [추가] padding 포함 */
+}
+
+/* === SVG를 래퍼 중앙에 'contain'으로 맞춤 === */
+.korea-map {
+    width: 100%;
+    height: 100%;
+    display: grid;                  /* [변경] block → grid */
+    place-items: center;            /* [추가] 중앙 정렬 */
+}
+
+.korea-map * { vector-effect: non-scaling-stroke; }
+
+/* [추가] 실제 주입되는 <svg> 크기 제한 (비율 유지, 잘림 없음) */
+.korea-map svg {
+    max-width: 100%;
+    max-height: 100%;
+    width: 100%;                    /* 가로는 채우되 */
+    height: auto;                   /* 세로는 비율 유지 */
+}
+
+/* [유지] 지도 패널 내부 레이아웃 (아래 문구 보이기) */
+.map-box .map-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+/* [유지] 지도 컨테이너는 남는 공간만 차지 */
+.map-box .map-wrapper {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+}
+
+/* [유지] 지도 아래 문구는 고정 영역 */
+.map-box .map-note {
+    flex: 0 0 auto;
+    margin: 4px 0 0;
+}
+
+/* 지도 도형 */
+.map-silhouette {
+    fill: #eef2f7
+    !important;
+    stroke: #c9d2de;
+    stroke-width: 1.2;
+}
+.map-region {
+    fill: #eef2f7
+    !important;
+    stroke: #c9d2de;
+    stroke-width: 1.2;
+    cursor: pointer;
+    transition: fill .2s, stroke .2s;
+}
+.map-region:hover {
+    fill: #dbeafe
+    !important;
+}
+.map-region.active {
+    fill: #60a5fa
+    !important;
+}

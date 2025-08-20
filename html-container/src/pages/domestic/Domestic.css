@@ -1,0 +1,125 @@
+/* 공통 컨테이너 */
+.domestic-container {
+    padding: 8px 16px;
+}
+.domestic-inner {
+    --panel-h: 640px; /* 원하는 높이로 조절 */
+}
+
+/* 좌우 2열, 동일 높이로 붙임 */
+.main-content {
+    display: grid;
+    grid-template-columns: 1.05fr 1fr; /* 필요 시 비율 조절 */
+    gap: 24px;
+    align-items: stretch; /* 같은 높이 */
+}
+
+/* 두 패널 공통 박스 스타일 */
+.panel {
+    height: var(--panel-h);
+    background: #fff;
+    border-radius: 16px;
+    padding: 16px;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden; /* 바깥 스크롤 제거 */
+}
+
+/* 좌측(지도) — 내부에서 지도 영역이 남는 공간을 꽉 채우게 */
+.map-box .map-flex {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+}
+.map-note {
+    color: #6b7280;
+    font-size: 12px;
+    margin: 0;
+
+}
+
+.map-note .highlight {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+
+/* 우측(리스트) — 위는 고정, 아래만 스크롤 */
+.list-box { /* .panel 공통 적용됨 */ }
+.list-static {
+    flex: 0 0 auto;
+}
+.results-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;         /* ★ 스크롤은 여기만 */
+    margin-top: 8px;
+    padding-right: 8px;       /* 스크롤바 여백 */
+}
+
+/* 스크롤바(선택) */
+.results-scroll::-webkit-scrollbar {
+    width: 8px;
+}
+.results-scroll::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 999px;
+}
+.results-scroll:hover::-webkit-scrollbar-thumb {
+    background: #c0c4cc;
+}
+
+/* 칩/입력 */
+.region-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 8px 0 12px;
+}
+.region-tag {
+    padding: 6px 12px;
+    border: 1px solid #d1d5db;
+    border-radius: 999px;
+    background: #fff;
+    color: #111827;
+    font-size: 13px;
+    cursor: pointer;
+}
+.region-tag.selected {
+    background: #2563eb;
+    color: #fff;
+    border-color: #2563eb;
+}
+.region-tag:hover {
+    background: #eff6ff;
+    border-color:#93c5fd;
+}
+
+.list-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: space-between;
+}
+.search-input {
+    width: 220px;
+    height: 36px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    outline: none;
+}
+.search-input:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96,165,250,0.25); }
+
+.step-label {
+    font-weight: 700;
+    color: #60a5fa;
+    margin-bottom: 4px; }
+
+/* 상태 메시지 */
+.status { margin: 6px 0 0; font-size: 13px; }
+.status-error { color: #b91c1c; }
+.status-loading { color: #6b7280; }
