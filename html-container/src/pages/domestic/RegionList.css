@@ -1,0 +1,14 @@
+.regionlist-empty { color: #6b7280; font-size: 14px; padding: 24px 0; }
+.regionlist-ul { list-style: none; margin: 0; padding: 0; }
+
+.regionlist-li { padding: 14px 0; border-top: 1px solid #f3f4f6; }
+.regionlist-li:first-child { border-top: none; }
+
+.regionlist-item {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 10px; align-items: start;
+}
+.regionlist-title { font-weight: 600; color: #111827; margin: 0 0 2px; }
+.regionlist-sub { margin: 0; font-size: 12px; color: #6b7280; }
+.regionlist-date { white-space: nowrap; font-size: 14px; color: #374151; }
