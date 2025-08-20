@@ -58,22 +58,22 @@ export default function Profile() {
                 </div>
                 <div className="pf-row">
                     <div className="pf-label">이름</div>
-                    <div className="pf-value pf-dots">〇〇〇</div>
+                    <div className="pf-value pf-dots">{user.name}</div>
                 </div>
             </section>
 
-            {/* 카드: 프로필 정보 */}
-            <section className="pf-card">
-                <div className="pf-card-title">프로필 정보</div>
-                <div className="pf-row">
-                    <div className="pf-label">닉네임</div>
-                    <div className="pf-value pf-dots">〇〇〇</div>
-                </div>
-                <div className="pf-row">
-                    <div className="pf-label">생년월일</div>
-                    <div className="pf-value pf-dots">〇〇〇〇.〇〇.〇〇.</div>
-                </div>
-            </section>
+            {/*/!* 카드: 프로필 정보 *!/*/}
+            {/*<section className="pf-card">*/}
+            {/*    <div className="pf-card-title">프로필 정보</div>*/}
+            {/*    <div className="pf-row">*/}
+            {/*        <div className="pf-label">닉네임</div>*/}
+            {/*        <div className="pf-value pf-dots">〇〇〇</div>*/}
+            {/*    </div>*/}
+            {/*    <div className="pf-row">*/}
+            {/*        <div className="pf-label">생년월일</div>*/}
+            {/*        <div className="pf-value pf-dots">〇〇〇〇.〇〇.〇〇.</div>*/}
+            {/*    </div>*/}
+            {/*</section>*/}
         </div>
     );
 }
